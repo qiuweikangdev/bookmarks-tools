@@ -19,6 +19,7 @@
   "devDependencies": {
     "@samrum/vite-plugin-web-extension": "^5.0.0",
     "@types/chrome": "^0.0.254",
+    "@types/pinyin": "^2.10.2",
     "@types/webextension-polyfill": "^0.10.6",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
@@ -43,6 +44,8 @@
   },
   "dependencies": {
     "ant-design-vue": "4.x",
+    "pinyin": "4.0.0-alpha.0",
+    "segmentit": "^2.0.3",
     "vue": "^3.3.8",
     "webextension-polyfill": "^0.10.0"
   },
