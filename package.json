@@ -10,7 +10,10 @@
     "watch": "vite build --watch --mode development --minify false",
     "dev": "vite",
     "serve:firefox": "web-ext run --start-url \"about:debugging#/runtime/this-firefox\"  --source-dir ./dist/",
-    "serve:chrome": "web-ext run -t chromium --start-url \"https://example.com\" --source-dir ./dist/"
+    "serve:chrome": "web-ext run -t chromium --start-url \"https://example.com\" --source-dir ./dist/",
+    "lint-staged": "lint-staged",
+    "prepare": "husky install",
+    "commit": "git-cz"
   },
   "license": "MIT",
   "devDependencies": {
@@ -20,10 +23,14 @@
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
     "@vitejs/plugin-vue": "^4.5.0",
+    "commitizen": "^4.3.0",
+    "cz-git": "^1.8.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.2",
     "eslint-plugin-vue": "^9.19.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
     "prettier": "^3.1.1",
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
@@ -33,5 +40,16 @@
   "dependencies": {
     "vue": "^3.3.8",
     "webextension-polyfill": "^0.10.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue,jsx,tsx}": [
+      "prettier --write",
+      "eslint --cache --fix"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
   }
 }
