@@ -24,7 +24,7 @@ const manifest: Partial<chrome.runtime.ManifestV3> = {
     512: 'icons/512.png',
   },
   // 配置权限
-  permissions: ['bookmarks'],
+  permissions: ['bookmarks', 'storage'],
 };
 
 export function getManifest(): chrome.runtime.ManifestV3 {

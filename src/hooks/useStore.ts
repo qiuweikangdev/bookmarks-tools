@@ -1,4 +1,4 @@
-import { reactive, toRefs } from 'vue';
+import { reactive, toRefs, watchEffect } from 'vue';
 
 type Checked = string | number | boolean;
 
@@ -17,6 +17,20 @@ export default function useStore() {
   const setStore = (state: any) => {
     Object.assign(store, state);
   };
+
+  const syncStorage = () => {
+    chrome.storage.sync.set({ bookmarksSettings: store });
+  };
+
+  chrome.storage.sync.get(['bookmarksSettings'], (storage) => {
+    if (storage.bookmarksSettings) {
+      setStore(storage.bookmarksSettings);
+    }
+  });
+
+  watchEffect(() => {
+    syncStorage();
+  });
 
   return {
     store,
