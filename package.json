@@ -32,6 +32,8 @@
     "eslint-plugin-prettier": "^5.1.2",
     "eslint-plugin-vue": "^9.19.2",
     "husky": "^8.0.3",
+    "less": "^4.2.0",
+    "less-loader": "^11.1.4",
     "lint-staged": "^15.2.0",
     "postcss": "^8.4.32",
     "prettier": "^3.1.1",
@@ -43,6 +45,7 @@
     "web-ext": "^7.8.0"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
     "ant-design-vue": "4.x",
     "pinyin": "4.0.0-alpha.0",
     "segmentit": "^2.0.3",
