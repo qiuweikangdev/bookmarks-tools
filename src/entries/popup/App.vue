@@ -16,7 +16,9 @@ import SearchSelect from '~/components/search-select/index.vue';
 import SettingsMenu from '~/components/settings-menu/index.vue';
 import useBookmarks, { BookmarksType } from '~/hooks/useBookmarks';
 import { ref } from 'vue';
+import useStore from '~/hooks/useStore';
 
+const { enablePinyin } = useStore();
 const { findBookmarkNodes } = useBookmarks();
 
 const bookmarksNodes = ref<BookmarksType[]>([]);
@@ -24,7 +26,10 @@ const bookmarksNodes = ref<BookmarksType[]>([]);
 const showSettings = ref(false);
 
 const handleChange = (bookmark: string) => {
-  const nodes = findBookmarkNodes(bookmark);
+  const nodes = findBookmarkNodes({
+    searchValue: bookmark,
+    enablePinyin: enablePinyin.value,
+  });
   bookmarksNodes.value = nodes;
 };
 </script>

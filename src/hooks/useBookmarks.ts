@@ -1,6 +1,5 @@
 import { onMounted, ref } from 'vue';
 import pinyin from 'pinyin';
-
 export type BookmarksType = Pick<
   chrome.bookmarks.BookmarkTreeNode,
   'id' | 'title' | 'url'
@@ -9,6 +8,11 @@ export type BookmarksType = Pick<
   favicon?: string;
 };
 type BookmarksDirType = Record<string, BookmarksType[]>;
+
+type FindBookmarkNodesType = {
+  searchValue: string;
+  enablePinyin: string | number | boolean;
+};
 
 export default function useBookmarks() {
   const bookmarks = ref<BookmarksType[]>([]);
@@ -68,15 +72,23 @@ export default function useBookmarks() {
     return result;
   };
 
-  const findBookmarkNodes = (searchValue = '') => {
-    const bookmarkNodes = bookmarks.value.filter(
-      (bookmark) =>
-        bookmark.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-        pinyin(bookmark.title, { style: pinyin.STYLE_NORMAL })
-          .join('')
-          .toLowerCase()
-          .includes(searchValue.toLowerCase()),
-    );
+  const findBookmarkNodes = ({
+    searchValue,
+    enablePinyin,
+  }: FindBookmarkNodesType) => {
+    const bookmarkNodes = bookmarks.value.filter((bookmark) => {
+      if (enablePinyin) {
+        return (
+          bookmark.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+          pinyin(bookmark.title, { style: pinyin.STYLE_NORMAL })
+            .join('')
+            .toLowerCase()
+            .includes(searchValue.toLowerCase())
+        );
+      } else {
+        return bookmark.title.toLowerCase().includes(searchValue.toLowerCase());
+      }
+    });
     return bookmarkNodes;
   };
 
