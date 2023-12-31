@@ -46,7 +46,10 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
+    "@octokit/plugin-create-or-update-text-file": "^4.0.1",
+    "@octokit/rest": "^20.0.2",
     "ant-design-vue": "4.x",
+    "dayjs": "^1.11.10",
     "pinyin": "4.0.0-alpha.0",
     "segmentit": "^2.0.3",
     "vue": "^3.3.8",

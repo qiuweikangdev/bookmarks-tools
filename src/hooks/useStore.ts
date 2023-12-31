@@ -1,4 +1,4 @@
-import { reactive, toRefs, watchEffect, onMounted } from 'vue';
+import { reactive, toRefs, watch, onMounted } from 'vue';
 
 type Checked = string | number | boolean;
 
@@ -6,12 +6,22 @@ export type StoreType = {
   showURL: Checked;
   showFullParentPath: Checked;
   enablePinyin: Checked;
+  githubSync: {
+    username: string;
+    accessToken: string;
+    repositoryName: string;
+  };
 };
 
-const initStore = {
+const initStore: StoreType = {
   showURL: true,
   showFullParentPath: true,
   enablePinyin: true,
+  githubSync: {
+    username: '',
+    accessToken: '',
+    repositoryName: '',
+  },
 };
 
 const store = reactive<StoreType>(initStore);
@@ -20,21 +30,23 @@ export default function useStore() {
     Object.assign(store, state);
   };
 
-  const syncStorage = () => {
-    chrome.storage.sync.set({ bookmarksSettings: store });
-  };
-
   onMounted(() => {
-    chrome.storage.sync.get(['bookmarksSettings'], (storage) => {
+    chrome.storage.local.get(['bookmarksSettings'], (storage) => {
       if (storage.bookmarksSettings) {
         setStore(storage.bookmarksSettings);
       }
     });
   });
 
-  watchEffect(() => {
-    syncStorage();
-  });
+  watch(
+    store,
+    (newStore) => {
+      chrome.storage.local.set({ bookmarksSettings: newStore });
+    },
+    {
+      deep: true,
+    },
+  );
 
   return {
     store,

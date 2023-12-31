@@ -24,6 +24,7 @@ export default function useBookmarks() {
       const treeData = tree[0].children || [];
       bookmarks.value = transformBookmarks(treeData);
       bookmarksTree.value = treeData;
+      console.log('bookmarksTree', bookmarksTree.value);
     });
   };
 

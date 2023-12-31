@@ -18,7 +18,12 @@
     </a-layout-sider>
     <a-layout>
       <a-layout-content>
-        <search-config></search-config>
+        <search-config
+          v-if="selectedKeys.includes(SelectedKeysEnum.Search)"
+        ></search-config>
+        <github-sync
+          v-if="selectedKeys.includes(SelectedKeysEnum.Sync)"
+        ></github-sync>
       </a-layout-content>
       <a-layout-content class="flex justify-end items-end mb-[10px] mr-[20px]">
         <a-affix :offset-bottom="0">
@@ -40,7 +45,14 @@ import {
 } from '@ant-design/icons-vue';
 import { ItemType } from 'ant-design-vue/es/menu';
 import SearchConfig from './components/search-config.vue';
-const selectedKeys = ref<string[]>(['search']);
+import GithubSync from './components/github-sync.vue';
+
+enum SelectedKeysEnum {
+  Search = 'search',
+  Sync = 'sync',
+}
+
+const selectedKeys = ref<string[]>([SelectedKeysEnum.Search]);
 const collapsed = ref<boolean>(false);
 const settingsMenuRef = ref();
 
@@ -48,12 +60,12 @@ const emit = defineEmits(['back']);
 
 const items: ItemType[] = [
   {
-    key: 'search',
+    key: SelectedKeysEnum.Search,
     icon: () => h(SearchOutlined),
     label: '搜索',
   },
   {
-    key: 'sync',
+    key: SelectedKeysEnum.Sync,
     icon: () => h(SyncOutlined),
     label: '同步',
   },
