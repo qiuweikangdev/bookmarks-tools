@@ -1,7 +1,10 @@
 import { onMounted, ref } from 'vue';
 import pinyin from 'pinyin';
+
+export type BookmarkTreeNodeType = chrome.bookmarks.BookmarkTreeNode;
+
 export type BookmarksType = Pick<
-  chrome.bookmarks.BookmarkTreeNode,
+  BookmarkTreeNodeType,
   'id' | 'title' | 'url'
 > & {
   fullParentPath?: string;
@@ -13,7 +16,6 @@ type FindBookmarkNodesType = {
   searchValue: string;
   enablePinyin: string | number | boolean;
 };
-
 export default function useBookmarks() {
   const bookmarks = ref<BookmarksType[]>([]);
   const bookmarksDir = ref<BookmarksDirType>({});
@@ -24,7 +26,6 @@ export default function useBookmarks() {
       const treeData = tree[0].children || [];
       bookmarks.value = transformBookmarks(treeData);
       bookmarksTree.value = treeData;
-      console.log('bookmarksTree', bookmarksTree.value);
     });
   };
 
@@ -35,7 +36,7 @@ export default function useBookmarks() {
   };
 
   const transformBookmarks = (
-    bookmarkNodes: chrome.bookmarks.BookmarkTreeNode[],
+    bookmarkNodes: BookmarkTreeNodeType[],
     parentFolder: string = '',
   ): BookmarksType[] => {
     const result: BookmarksType[] = [];
@@ -93,6 +94,65 @@ export default function useBookmarks() {
     return bookmarkNodes;
   };
 
+  // 删除本地书签数据
+  const removeBookmarks = (parentId: string): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      chrome.bookmarks.getChildren(parentId, (children) => {
+        const promises = children.map((bookmark) => {
+          return new Promise((resolveBookmark) => {
+            if (bookmark.parentId === '0') {
+              removeBookmarks(bookmark.id)
+                .then(() => resolveBookmark())
+                .catch((error) => reject(error));
+            } else {
+              chrome.bookmarks.removeTree(bookmark.id, () => resolveBookmark());
+            }
+          });
+        });
+
+        Promise.all(promises)
+          .then(() => resolve())
+          .catch((error) => reject(error));
+      });
+    });
+  };
+
+  // 替换本地书签数据
+  const replaceBookmarksTree = (bookmarkTree: BookmarkTreeNodeType[]) => {
+    // 获取当前书签树
+    chrome.bookmarks.getTree((tree) => {
+      tree.forEach(async (rootFolder) => {
+        if (rootFolder && rootFolder.id) {
+          // 删除本地所有书签
+          await removeBookmarks(rootFolder.id);
+          // 创建新的书签树
+          await createBookmarks(bookmarkTree);
+        }
+      });
+    });
+  };
+
+  // 创建书签的方法
+  const createBookmarks = async (
+    bookmarkTree: BookmarkTreeNodeType[] = [],
+    curId?: string,
+  ) => {
+    for (const bookmark of bookmarkTree) {
+      const { title, url, children, id, parentId } = bookmark;
+      if (parentId === '0') {
+        await createBookmarks(children, id);
+        continue;
+      } else {
+        const bookmarkTreeNode = await chrome.bookmarks.create({
+          parentId: curId,
+          title,
+          url,
+        });
+        createBookmarks(children, bookmarkTreeNode.id);
+      }
+    }
+  };
+
   onMounted(() => {
     getBookmarks();
   });
@@ -103,5 +163,6 @@ export default function useBookmarks() {
     bookmarksTree,
     transformBookmarks,
     findBookmarkNodes,
+    replaceBookmarksTree,
   };
 }

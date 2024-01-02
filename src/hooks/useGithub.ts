@@ -3,20 +3,25 @@ import { createOrUpdateTextFile } from '@octokit/plugin-create-or-update-text-fi
 import { StoreType } from './useStore';
 import { ref } from 'vue';
 import { message } from 'ant-design-vue';
+import useBookmarks from './useBookmarks';
 
-type GithubType = StoreType['githubSync'];
+type GithubType = StoreType['githubSync'] & {
+  path?: string;
+};
 
 type SyncBookmarksType = {
   bookmarksData: any[];
   commitMessage: string;
-  path: string;
 };
 export default function useGithub({
   accessToken,
   username,
   repositoryName,
+  path = 'bookmarks',
 }: GithubType) {
   const syncLoading = ref(false);
+  const downloadLoading = ref(false);
+  const { replaceBookmarksTree } = useBookmarks();
 
   const myOctokit = Octokit.plugin(createOrUpdateTextFile);
   const octokit = new myOctokit({ auth: accessToken });
@@ -38,7 +43,6 @@ export default function useGithub({
   const syncBookmarks = async ({
     bookmarksData,
     commitMessage,
-    path,
   }: SyncBookmarksType) => {
     try {
       syncLoading.value = true;
@@ -66,8 +70,50 @@ export default function useGithub({
     }
   };
 
+  // 获取书签内容
+  const getBookmarksContent = async () => {
+    const response = await octokit.repos.getContent({
+      owner: username,
+      repo: repositoryName,
+      path,
+    });
+
+    const fileData = response.data as { content: string };
+
+    // 解码 base64 字符串为二进制数据
+    const binaryString = atob(fileData.content);
+    const bytes = new Uint8Array(binaryString.length);
+
+    // 防止乱码
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    // 解析 JSON 字符串
+    const decodedContent = new TextDecoder('utf-8').decode(bytes);
+    const bookmarksData = JSON.parse(decodedContent);
+
+    return bookmarksData;
+  };
+
+  // 下载书签内容到本地
+  const downloadBookmarks = async () => {
+    downloadLoading.value = true;
+    try {
+      const bookmarksData = await getBookmarksContent();
+      replaceBookmarksTree(bookmarksData);
+      message.success('下载成功！');
+    } catch (e: any) {
+      message.error(e.toString());
+    } finally {
+      downloadLoading.value = false;
+    }
+  };
+
   return {
     syncLoading,
+    downloadLoading,
     syncBookmarks,
+    downloadBookmarks,
   };
 }
