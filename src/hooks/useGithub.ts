@@ -21,6 +21,8 @@ export default function useGithub({
 }: GithubType) {
   const syncLoading = ref(false);
   const downloadLoading = ref(false);
+  const commitListLoading = ref(false);
+  const versionLoading = ref(false);
   const { replaceBookmarksTree } = useBookmarks();
 
   const myOctokit = Octokit.plugin(createOrUpdateTextFile);
@@ -71,11 +73,12 @@ export default function useGithub({
   };
 
   // 获取书签内容
-  const getBookmarksContent = async () => {
+  const getBookmarksContent = async (param = {}) => {
     const response = await octokit.repos.getContent({
       owner: username,
       repo: repositoryName,
       path,
+      ...param,
     });
 
     const fileData = response.data as { content: string };
@@ -110,10 +113,51 @@ export default function useGithub({
     }
   };
 
+  // 获取commit记录列表
+  const getCommitsList = async () => {
+    try {
+      commitListLoading.value = true;
+      const { defaultBranch } = await getRepoInfo();
+      const { data } = await octokit.repos.listCommits({
+        owner: username,
+        repo: repositoryName,
+        ref: defaultBranch,
+      });
+      const list = (data || []).map((item) => ({
+        value: item.sha,
+        label: item.commit.message,
+      }));
+      return list;
+    } catch (e: any) {
+      message.error(e.toString());
+    } finally {
+      commitListLoading.value = false;
+    }
+  };
+
+  const switchVersion = async (commitSha: string) => {
+    if (commitSha) {
+      try {
+        versionLoading.value = true;
+        const bookmarksData = await getBookmarksContent({ ref: commitSha });
+        replaceBookmarksTree(bookmarksData);
+        message.success('切换版本成功！');
+      } catch (e: any) {
+        message.error(e.toString());
+      } finally {
+        versionLoading.value = false;
+      }
+    }
+  };
+
   return {
     syncLoading,
     downloadLoading,
+    commitListLoading,
+    versionLoading,
     syncBookmarks,
     downloadBookmarks,
+    getCommitsList,
+    switchVersion,
   };
 }

@@ -1,30 +1,33 @@
 <template>
   <a-layout
     ref="settingsMenuRef"
-    class="settings-menu w-[450px] min-h-[200px] bg-[#4885e0]"
+    class="settings-menu w-[500px] min-h-[200px] bg-[#4885e0]"
   >
     <a-layout-sider
       v-model:collapsed="collapsed"
       :trigger="null"
       collapsible
-      class="!bg-[#fff] p-[14px] !w-[150px] !min-w-[150px] !max-w-[150px] !flex-auto"
+      class="!bg-[#fff] p-[14px] !w-[160px] !min-w-[150px] !max-w-[150px] !flex-auto"
     >
       <a-menu
         v-model:selectedKeys="selectedKeys"
         :items="items"
-        class="!w-[120px] !min-w-[120px]"
+        class="!w-[130px] !min-w-[130px]"
       >
       </a-menu>
     </a-layout-sider>
     <a-layout>
-      <a-layout-content>
-        <search-config
-          v-if="selectedKeys.includes(SelectedKeysEnum.Search)"
-        ></search-config>
-        <github-sync
-          v-if="selectedKeys.includes(SelectedKeysEnum.Sync)"
-        ></github-sync>
-      </a-layout-content>
+      <layout-content :name="menuKey">
+        <template #[SelectedKeysEnum.Search]>
+          <search-config></search-config>
+        </template>
+        <template #[SelectedKeysEnum.Sync]>
+          <github-sync></github-sync>
+        </template>
+        <template #[SelectedKeysEnum.Version]>
+          <history-version></history-version>
+        </template>
+      </layout-content>
       <a-layout-content class="flex justify-end items-end mb-[10px] mr-[20px]">
         <a-affix :offset-bottom="0">
           <file-search-outlined
@@ -37,19 +40,22 @@
   </a-layout>
 </template>
 <script setup lang="ts">
-import { ref, h } from 'vue';
+import { ref, h, computed } from 'vue';
 import {
   SearchOutlined,
   FileSearchOutlined,
   SyncOutlined,
+  FieldTimeOutlined,
 } from '@ant-design/icons-vue';
 import { ItemType } from 'ant-design-vue/es/menu';
+import LayoutContent from '~/components/layout-content/index.vue';
 import SearchConfig from './components/search-config.vue';
 import GithubSync from './components/github-sync.vue';
-
+import HistoryVersion from './components/history-version.vue';
 enum SelectedKeysEnum {
   Search = 'search',
   Sync = 'sync',
+  Version = 'Version',
 }
 
 const selectedKeys = ref<string[]>([SelectedKeysEnum.Search]);
@@ -58,16 +64,25 @@ const settingsMenuRef = ref();
 
 const emit = defineEmits(['back']);
 
+const menuKey = computed(
+  () => selectedKeys.value[0] || SelectedKeysEnum.Search,
+);
+
 const items: ItemType[] = [
   {
     key: SelectedKeysEnum.Search,
     icon: () => h(SearchOutlined),
-    label: '搜索',
+    label: '搜索设置',
   },
   {
     key: SelectedKeysEnum.Sync,
     icon: () => h(SyncOutlined),
-    label: '同步',
+    label: '同步设置',
+  },
+  {
+    key: SelectedKeysEnum.Version,
+    icon: () => h(FieldTimeOutlined),
+    label: '历史版本',
   },
 ];
 </script>

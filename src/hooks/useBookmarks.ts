@@ -96,10 +96,10 @@ export default function useBookmarks() {
 
   // 删除本地书签数据
   const removeBookmarks = (parentId: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       chrome.bookmarks.getChildren(parentId, (children) => {
         const promises = children.map((bookmark) => {
-          return new Promise((resolveBookmark) => {
+          return new Promise<void>((resolveBookmark) => {
             if (bookmark.parentId === '0') {
               removeBookmarks(bookmark.id)
                 .then(() => resolveBookmark())

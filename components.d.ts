@@ -25,6 +25,7 @@ declare module 'vue' {
     ARadio: (typeof import('ant-design-vue/es'))['Radio'];
     ARadioGroup: (typeof import('ant-design-vue/es'))['RadioGroup'];
     ASelect: (typeof import('ant-design-vue/es'))['Select'];
+    ASelectOption: (typeof import('ant-design-vue/es'))['SelectOption'];
     ASpin: (typeof import('ant-design-vue/es'))['Spin'];
     ASwitch: (typeof import('ant-design-vue/es'))['Switch'];
     ATabPane: (typeof import('ant-design-vue/es'))['TabPane'];
@@ -32,6 +33,8 @@ declare module 'vue' {
     ATextarea: (typeof import('ant-design-vue/es'))['Textarea'];
     ContextMenu: (typeof import('./src/components/context-menu/index.vue'))['default'];
     GithubSync: (typeof import('./src/components/settings-menu/components/github-sync.vue'))['default'];
+    HistoryVersion: (typeof import('./src/components/settings-menu/components/history-version.vue'))['default'];
+    LayoutContent: (typeof import('./src/components/layout-content/index.vue'))['default'];
     SearchConfig: (typeof import('./src/components/settings-menu/components/search-config.vue'))['default'];
     SearchSelect: (typeof import('./src/components/search-select/index.vue'))['default'];
     SettingMenu: (typeof import('./src/components/setting-menu/index.vue'))['default'];
