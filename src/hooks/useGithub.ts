@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest';
 import { createOrUpdateTextFile } from '@octokit/plugin-create-or-update-text-file';
-import { StoreType } from './useStore';
+import useStore, { StoreType } from './useStore';
 import { ref } from 'vue';
 import { message } from 'ant-design-vue';
 import useBookmarks from './useBookmarks';
@@ -13,12 +13,10 @@ type SyncBookmarksType = {
   bookmarksData: any[];
   commitMessage: string;
 };
-export default function useGithub({
-  accessToken,
-  username,
-  repositoryName,
-  path = 'bookmarks',
-}: GithubType) {
+export default function useGithub({ path = 'bookmarks' }: GithubType) {
+  const { githubSync } = useStore();
+  const { accessToken, username, repositoryName } = githubSync.value;
+
   const syncLoading = ref(false);
   const downloadLoading = ref(false);
   const commitListLoading = ref(false);

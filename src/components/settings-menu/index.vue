@@ -58,22 +58,15 @@ enum SelectedKeysEnum {
   Version = 'Version',
 }
 
-const selectedKeys = ref<string[]>([SelectedKeysEnum.Search]);
+const selectedKeys = ref<string[]>([SelectedKeysEnum.Sync]);
 const collapsed = ref<boolean>(false);
 const settingsMenuRef = ref();
 
 const emit = defineEmits(['back']);
 
-const menuKey = computed(
-  () => selectedKeys.value[0] || SelectedKeysEnum.Search,
-);
+const menuKey = computed(() => selectedKeys.value[0] || SelectedKeysEnum.Sync);
 
 const items: ItemType[] = [
-  {
-    key: SelectedKeysEnum.Search,
-    icon: () => h(SearchOutlined),
-    label: '搜索设置',
-  },
   {
     key: SelectedKeysEnum.Sync,
     icon: () => h(SyncOutlined),
@@ -83,6 +76,11 @@ const items: ItemType[] = [
     key: SelectedKeysEnum.Version,
     icon: () => h(FieldTimeOutlined),
     label: '历史版本',
+  },
+  {
+    key: SelectedKeysEnum.Search,
+    icon: () => h(SearchOutlined),
+    label: '搜索设置',
   },
 ];
 </script>

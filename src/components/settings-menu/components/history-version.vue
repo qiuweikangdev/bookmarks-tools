@@ -55,6 +55,9 @@ onMounted(() => {
 });
 
 const handleCommitList = async () => {
+  if (Object.values(githubSync.value).some((value) => !value)) {
+    return;
+  }
   const list = await getCommitsList();
   commitList.value = list || [];
 };
