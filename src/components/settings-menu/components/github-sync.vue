@@ -2,6 +2,7 @@
   <div>
     <github-outlined
       class="w-full justify-center text-[32px] py-[12px] text-[#1677ff]"
+      @click="skipToGithub"
     />
     <a-spin :spinning="syncLoading || downloadLoading">
       <a-form
@@ -65,5 +66,11 @@ const uploadGithub = async () => {
 
 const downloadGithub = async () => {
   await downloadBookmarks();
+};
+
+const skipToGithub = () => {
+  chrome.tabs.create({
+    url: 'https://github.com/qiuweikangdev/bookmarks-tools',
+  });
 };
 </script>
