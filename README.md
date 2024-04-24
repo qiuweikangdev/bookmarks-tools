@@ -13,6 +13,8 @@
 
 
 
-![](https://raw.githubusercontent.com/qiuweikangdev/bookmarks-tools/master/images/demo.1)
+![](https://raw.githubusercontent.com/qiuweikangdev/bookmarks-tools/master/images/demo1.png)
 
-![](https://raw.githubusercontent.com/qiuweikangdev/bookmarks-tools/master/images/demo.2)
+
+
+![](https://raw.githubusercontent.com/qiuweikangdev/bookmarks-tools/master/images/demo2.png)
