@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref } from 'vue';
 import { DefaultOptionType } from 'ant-design-vue/es/vc-tree-select/TreeSelect';
 import { RefSelectProps } from 'ant-design-vue/es/select';
 import { SettingOutlined } from '@ant-design/icons-vue';
@@ -60,10 +60,16 @@ import useStore from '~/hooks/useStore';
 const { store } = useStore();
 
 type Props = {
-  data: DefaultOptionType[];
+  data: SearchOptionType[];
 };
 
-withDefaults(defineProps<Props>(), {
+type SearchOptionType = DefaultOptionType & {
+  id?: string | number;
+  url?: string;
+  children?: SearchOptionType[];
+};
+
+const props = withDefaults(defineProps<Props>(), {
   data: () => {
     return [];
   },
@@ -71,13 +77,47 @@ withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['change', 'settings']);
 
-const searchValue = ref('');
+const searchValue = ref<string | number>('');
 const searchRef = ref<RefSelectProps>();
 const open = ref(false);
-const selectItem = reactive<any>({});
+const selectItem = ref<SearchOptionType | null>(null);
+
+const findOptionByValue = (
+  options: SearchOptionType[],
+  value: string,
+): SearchOptionType | null => {
+  for (const option of options) {
+    const currentValue = option.id ?? option.value;
+    if (currentValue !== undefined && String(currentValue) === value) {
+      return option;
+    }
+
+    if (option.children?.length) {
+      const childOption = findOptionByValue(option.children, value);
+      if (childOption) {
+        return childOption;
+      }
+    }
+  }
+
+  return null;
+};
+
+const getSelectedOption = () => {
+  if (selectItem.value?.url) {
+    return selectItem.value;
+  }
+
+  if (!searchValue.value) {
+    return null;
+  }
+
+  return findOptionByValue(props.data, String(searchValue.value));
+};
 
 const handleSearch = (value: string) => {
   searchValue.value = value;
+  selectItem.value = null;
   emit('change', value);
   open.value = Boolean(value);
 };
@@ -88,16 +128,28 @@ const handleBlur = () => {
   }
 };
 
-const handleLink = (url: string) => {
+const handleLink = (url?: string) => {
+  if (!url) {
+    return;
+  }
+
+  open.value = false;
   window.open(url);
 };
 
 const handleKeydown = () => {
-  handleLink(selectItem.url);
+  if (!open.value) {
+    return;
+  }
+
+  window.setTimeout(() => {
+    const option = getSelectedOption();
+    handleLink(option?.url);
+  }, 0);
 };
 
-const handleSelect = (_: any, option: any) => {
-  Object.assign(selectItem, option);
+const handleSelect = (_: unknown, option: SearchOptionType) => {
+  selectItem.value = option;
 };
 
 const handleSettings = () => {
