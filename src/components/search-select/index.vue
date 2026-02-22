@@ -52,8 +52,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { DefaultOptionType } from 'ant-design-vue/es/vc-tree-select/TreeSelect';
 import { RefSelectProps } from 'ant-design-vue/es/select';
+import { DefaultOptionType } from 'ant-design-vue/es/vc-select/Select';
 import { SettingOutlined } from '@ant-design/icons-vue';
 import useStore from '~/hooks/useStore';
 
